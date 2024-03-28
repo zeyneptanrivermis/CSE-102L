@@ -1,7 +1,7 @@
 //  ZEYNEP TANRIVERMİŞ
 //  20220808038
 //  23.02.2024
-public class HW01_20220808038 {
+public class H01_20220808038 {
 	public static void main(String[] args) {
         //  testing the Stock class
         Stock stock = new Stock("GoogL", "AlPhabet inc.");
