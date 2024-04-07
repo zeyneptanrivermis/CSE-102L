@@ -1,8 +1,10 @@
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
-public class HW04_20220808038 {
+public class H04_20220808038 {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws MemoryException, ComputationException {
         CPU cpu = new CPU("Intel", 2.5);
         RAM ram = new RAM("DDR4", 8);
 
@@ -54,25 +56,16 @@ class Computer {
         this.ram = ram;
     }
 
-    public void run() throws InterruptedException {
+    public void run() throws InterruptedException, MemoryException, ComputationException {
         int sum = 0;
         for (int i = 0; i < ram.getCapacity(); i++) {
             sum += ram.getValue(i, i);
         }
         try {
             ram.setValue(0, 0, sum);
-        } catch (MemoryException e) {
+        } 
+        catch (MemoryException e) {
             e.printStackTrace();
-        } catch (ComputationException e) {
-            try {
-                sum = cpu.fixComputation(sum, sum);
-                ram.setValue(0, 0, sum);
-            } catch (ComputationException ex) {
-                ex.printStackTrace();
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            Thread.currentThread().interrupt(); 
         }
     }
 
@@ -101,7 +94,7 @@ class Laptop extends Computer {
         }
     }
 
-    public void run() throws InterruptedException {
+    public void run() throws InterruptedException, MemoryException, ComputationException {
         if (battery > milliAmp * 5 / 100) {
             super.run();
             battery -= milliAmp * 3 / 100;
@@ -123,7 +116,7 @@ class Desktop extends Computer {
         this.peripherals = new ArrayList<>(Arrays.asList(peripherals));
     }
 
-    public void run() throws InterruptedException {
+    public void run() throws InterruptedException, MemoryException, ComputationException {
         int sum = 0;
         for (int i = 0; i < ram.getCapacity(); i++) {
             for (int j = 0; j < ram.getCapacity(); j++) {
@@ -195,6 +188,16 @@ class CPU {
         return result;
     }
 
+    public int fixComputation(int val1, int val2) throws ComputationException, InterruptedException {
+        try {
+            val1 = Math.abs(val1);
+            val2 = Math.abs(val2);
+            return this.compute(val1, val2);
+        } catch (ComputationException e) {
+            throw new ComputationException(this, val1, val2);
+        }
+    }
+
     public String toString() {
         return "CPU: " + name + " " + clock + "Ghz";
     }
@@ -224,10 +227,9 @@ class RAM {
 
     for (int i = 0; i < memory.length; i++) {
         for (int k = 0; k < memory.length; k++) {
-            memory[i][k] = random.nextInt(11);
+            memory[i][k] = random.nextInt(10);
         }
     }
-
     }
 
     private boolean check(int i, int j) throws MemoryException {
@@ -241,14 +243,17 @@ class RAM {
 
     public int getValue(int i, int j) throws MemoryException {
         if (!check(i, j)) {
-            return -1;
+            throw new MemoryException(this, i, j);
         }
         return memory[i][j];
     }
 
-    public void setValue(int i, int j, int value) {
+    public void setValue(int i, int j, int value) throws MemoryException {
         if (check(i, j)) {
             memory[i][j] = value;
+        }
+        else {
+            throw new MemoryException(this, i, j);
         }
     }
 
@@ -289,14 +294,19 @@ class ComputationException extends Exception {
         this.value2 = e.value2;
     }
 
+    public ComputationException(String string, InterruptedException e) {
+    }
+
     public int fixComputation(int val1, int val2) throws ComputationException {
         try {
             val1 = Math.abs(val1);
             val2 = Math.abs(val2);
             return cpu.compute(val1, val2);
-        } catch (ComputationException e) {
+        } 
+        catch (ComputationException e) {
             throw e;
-        } catch (InterruptedException e) {
+        } 
+        catch (InterruptedException e) {
             e.printStackTrace();
             return -1;
         }
