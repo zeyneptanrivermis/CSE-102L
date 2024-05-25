@@ -1,6 +1,6 @@
 import java.util.*;
 
-public class H08_20220808038 {
+public class HW08_20220808038 {
     public static void main(String[] args) {
     }
 }
